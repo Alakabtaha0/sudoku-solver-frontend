@@ -1,0 +1,4 @@
+1. Add a name and description field to the front end
+2. Add a new section where the user can change the details and puzzle
+3. Go to the API and add a solve section
+4. Display the solved sudoku
