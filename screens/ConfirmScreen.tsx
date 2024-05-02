@@ -354,12 +354,21 @@ const ConfirmScreen = () => {
         ]
     ]);
     const [edit, setEdit] = useState<boolean>(false);
-    const [name, setName] = useState<string>('');
-    const [description, setDescription] = useState<string>('');
+    const [name, setName] = useState<string>('Testing editing function');
+    const [description, setDescription] = useState<string>('Testing editing function');
 
     const editCell = (e: any, row: number, col: number) => {
         if (edit) {
-            console.log('Editing cell:: ', e.nativeEvent.text, row, col);
+            const newSudoku = sudoku;
+            const cell = newSudoku[row][col];
+            const text = e.nativeEvent.text;
+            if (text === '' || text === '0') {
+                cell.num = null;
+                cell.init = false;
+            } else {
+                cell.num = parseInt(text);
+            }
+            setSudoku(newSudoku);
         }
     }
 
@@ -379,7 +388,6 @@ const ConfirmScreen = () => {
                                     <Text>{cell.num}</Text>
                                 </TextInput>
                             )
-
                         })
                     }
                 </View>
@@ -391,8 +399,8 @@ const ConfirmScreen = () => {
         <View style={styles.container}>
             {!edit && <View style={styles.inputBlock}></View>}
             <Text style={styles.headerText}>Everything correct?</Text>
-            <TextInput style={styles.textBox} placeholder='Enter the name of this sudoku' returnKeyType='done' />
-            <TextInput style={styles.textBox} placeholder='Enter the description' returnKeyType='done' />
+            <TextInput style={styles.textBox} value={name} onChangeText={setName} placeholder='Enter the name of this sudoku' returnKeyType='done' />
+            <TextInput style={styles.textBox} value={description} onChangeText={setDescription} placeholder='Enter the description' returnKeyType='done' />
             <View style={styles.sudokuContainer}>
                 {renderGrid()}
             </View>
@@ -401,7 +409,7 @@ const ConfirmScreen = () => {
                     <Text style={styles.text}>Solve</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={edit ? styles.selectedButton : styles.button} onPress={() => setEdit(!edit)}>
-                    <Text style={styles.text}>Edit</Text>
+                    <Text style={styles.text}>{edit ? 'Confirm' : 'Edit'}</Text>
                 </TouchableOpacity>
             </View>
         </View>
