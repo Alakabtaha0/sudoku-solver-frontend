@@ -2,17 +2,21 @@ import { Camera, CameraType } from 'expo-camera';
 import { useState, useRef } from 'react';
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
+type CameraScreenProps = {
+	navigation: any;
 
-const CameraScreen = () => {
-    const [type, setType] = useState<CameraType>(CameraType.back);
+}
+
+const CameraScreen: React.FC<CameraScreenProps> = ({ navigation }) => {
+	const [type, setType] = useState<CameraType>(CameraType.back);
 	const [permission, requestPermission] = Camera.useCameraPermissions();
-    const [name, setName] = useState<string>('');
-    const [description, setDescription] = useState<string>('');
+	const [name, setName] = useState<string>('');
+	const [description, setDescription] = useState<string>('');
 	const cameraRef = useRef<Camera | null>(null);
 
 
 	const takePicture = async () => {
-        // Options for the picture
+		// Options for the picture
 		let options = {
 			quality: 1,
 			base64: true,
@@ -21,11 +25,12 @@ const CameraScreen = () => {
 		// Creates a base64 encoded image - a string representation of the image
 		let newPhoto = await cameraRef.current?.takePictureAsync(options);
 		// Send the image to the server in multipart media
-		const formData:FormData = new FormData();
+		const formData: FormData = new FormData();
 		formData.append('image', `${newPhoto?.base64}`);
-        formData.append('name', name);
-        formData.append('description', description);
+		formData.append('name', name);
+		formData.append('description', description);
 
+		// Send the image to the server
 		const x = fetch("http://192.168.1.23:8000/sudokus/", {
 			method: 'POST',
 			body: formData,
@@ -36,16 +41,17 @@ const CameraScreen = () => {
 				'Connection': 'keep-alive',
 
 			}
-		}).then(response => response.blob())
-        .then(blob => {
-            // Convert the blob to JSON
-            const reader = new FileReader();
-            reader.onload = () => {
-                console.log("Response JSON:: ", reader.result);
-            }
-        }).catch(err => console.error(err));
-		// const data = response.json();
-		// console.log(data);	
+		}).then(blob => {
+			// Convert the blob to JSON
+			// Need to store the response in redux
+			const reader = new FileReader();
+			reader.onload = () => {
+				console.log("Response JSON:: ", reader.result);
+			}
+			// Switch screens
+			navigation.navigate('Confirm');
+		}).catch(err => console.error(err));
+		console.log(x);
 	};
 
 
@@ -69,20 +75,32 @@ const CameraScreen = () => {
 	}
 
 	return (
-		<View style={styles.container}>
-            <TextInput value={name} onChangeText={setName} style={styles.textBox} placeholder='Enter the name of this sudoku'/>
-            <TextInput value={description} onChangeText={setDescription} style={styles.textBox} placeholder='Enter the description'/>
-			<Camera style={styles.camera} type={type} ref={cameraRef} autoFocus={Camera.Constants.AutoFocus} focusDepth={0.5}>
-				<View style={styles.buttonContainer}>
-					<TouchableOpacity style={styles.button} onPress={takePicture}>
-					</TouchableOpacity>
-				</View>
-			</Camera>
-		</View>
+		<>
+			<View style={styles.textContainer}>
+				<TextInput value={name} onChangeText={setName} style={styles.textBox} placeholder='Enter the name of this sudoku' returnKeyType='done' />
+				<TextInput value={description} onChangeText={setDescription} style={styles.textBox} placeholder='Enter the description' returnKeyType='done' />
+			</View>
+			<View style={styles.container}>
+				<Camera style={styles.camera} type={type} ref={cameraRef} autoFocus={Camera.Constants.AutoFocus} focusDepth={0.5}>
+					<View style={styles.buttonContainer}>
+						<TouchableOpacity style={styles.button} onPress={takePicture}>
+						</TouchableOpacity>
+					</View>
+				</Camera>
+			</View>
+		</>
+
 	);
 }
 
 const styles = StyleSheet.create({
+	textContainer: {
+		position: 'absolute',
+		backgroundColor: 'transparent',
+		zIndex: 100,
+		marginTop: 50,
+		width: '80%'
+	},
 	container: {
 		flex: 1,
 		justifyContent: 'center',
@@ -112,13 +130,14 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: 'white',
 	},
-    textBox: {
-        borderWidth: 1,
-        borderColor: 'black',
-        borderRadius: 5,
-        padding: 5,
-        margin: 5
-    }
+	textBox: {
+		borderWidth: 1,
+		borderColor: 'black',
+		borderRadius: 5,
+		padding: 10,
+		margin: 5,
+		backgroundColor: 'white',
+	}
 });
 
 
