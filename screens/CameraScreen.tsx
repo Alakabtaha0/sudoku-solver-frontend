@@ -1,11 +1,9 @@
 import { Camera, CameraType } from 'expo-camera';
 import { useState, useRef } from 'react';
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { CameraScreenProps } from '../utils/types';
+import { postData } from '../utils/apiCalls';
 
-type CameraScreenProps = {
-	navigation: any;
-
-}
 
 const CameraScreen: React.FC<CameraScreenProps> = ({ navigation }) => {
 	const [type, setType] = useState<CameraType>(CameraType.back);
@@ -25,33 +23,31 @@ const CameraScreen: React.FC<CameraScreenProps> = ({ navigation }) => {
 		// Creates a base64 encoded image - a string representation of the image
 		let newPhoto = await cameraRef.current?.takePictureAsync(options);
 		// Send the image to the server in multipart media
-		const formData: FormData = new FormData();
-		formData.append('image', `${newPhoto?.base64}`);
-		formData.append('name', name);
-		formData.append('description', description);
+		// const formData: FormData = new FormData();
+		// formData.append('image', `${newPhoto?.base64}`);
+		// formData.append('name', name);
+		// formData.append('description', description);
 
-		// Send the image to the server
-		const x = fetch("http://192.168.1.23:8000/sudokus/", {
-			method: 'POST',
-			body: formData,
-			headers: {
-				'Content-Type': 'multipart/form-data',
-				'Accept': '*/*',
-				'Aceept-Encoding': 'gzip, deflate, br',
-				'Connection': 'keep-alive',
+		// send the image via json
+		const formData = {
+			image: newPhoto?.base64,
+			name: name,
+			description: description
+		};
 
-			}
-		}).then(blob => {
-			// Convert the blob to JSON
-			// Need to store the response in redux
-			const reader = new FileReader();
-			reader.onload = () => {
-				console.log("Response JSON:: ", reader.result);
-			}
-			// Switch screens
-			navigation.navigate('Confirm');
-		}).catch(err => console.error(err));
-		console.log(x);
+		// Post Data
+		postData("http://192.168.1.23:8000/sudokus/", JSON.stringify(formData)).then(data => console.log("Data received: ", data)).catch(err => console.error(err));
+		// const x = postData("http://192.168.1.23:8000/sudokus/", formData)
+		// .then(promise => {
+		// 	console.log("Promise: ", promise);
+		// });
+
+		// Switch screens
+        // navigation.navigate('Confirm');
+
+
+		
+
 	};
 
 
