@@ -1,6 +1,11 @@
 1. Add a name and description field to the front end -- DONE
 2. Add a new section where the user can change the details and puzzle -- DONE
-3. Go to the API and add a solve section
-4. Display the solved sudoku
-5. Create a load screen
-6. Incorporate Redux
+3. Go to the API and add a solve section -- DONE
+4. Display the solved sudoku -- DONE
+6. Incorporate Redux -- DONE
+
+** NEED TO COMPLETE
+1. Create a load screen
+2. Add a user log in function
+3. Add documentation to code
+4. Refactor any code into utils files and make more react

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { userState } from '../utils/types';
 
@@ -20,39 +20,21 @@ const userSlice = createSlice({
             state.description = action.payload.description;
             state.puzzle = action.payload.puzzle;
             state.solution = action.payload.solution;
+        },
+        setSolution: (state, action: PayloadAction<Array<Array<object>>>) => {
+            state.solution = action.payload;
+        
+        },
+        resetUser: (state) => {
+            state.id = 0;
+            state.name = '';
+            state.description = '';
+            state.puzzle = null;
+            state.solution = null;
         }
     }
 });
 
-// export const postSudokuAsync = createAsyncThunk(
-//     "user/postSudoku",
-//     async (url:string, data:any) => {
-//         // Return the completed
-//         return fetch(url, {
-//             method: 'POST',
-//             body: data,
-//             headers: {
-//                 // 'Content-Type': 'multipart/form-data',
-//                 'Accept': '*/*',
-//                 'Aceept-Encoding': 'gzip, deflate, br',
-//                 'Connection': 'keep-alive',
-//             }
-//         }).then(blob => {
-//             // Convert the blob to JSON
-//             // Need to store the response in redux
-//             const reader = new FileReader();
-//             reader.onload = () => {
-//                 console.log("Response JSON:: ", reader.result);
-//                 return reader.result;
-//             }
-//         }).catch(err => {
-//             console.error("Error: ", err);
-//             return err;
-//         });
-//     }
-// );
-
-
 export default userSlice.reducer;
 
-export const { setUser } = userSlice.actions;
+export const { setUser, setSolution, resetUser } = userSlice.actions;
